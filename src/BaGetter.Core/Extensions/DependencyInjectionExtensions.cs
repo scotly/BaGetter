@@ -4,6 +4,7 @@ using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Reflection;
 using System.Text;
+using BaGetter.Core.Indexing;
 using BaGetter.Core.Statistics;
 using BaGetter.Protocol;
 using Microsoft.Extensions.Configuration;
@@ -103,6 +104,7 @@ public static partial class DependencyInjectionExtensions
         services.TryAddTransient<ISymbolIndexingService, SymbolIndexingService>();
         services.TryAddTransient<ISymbolStorageService, SymbolStorageService>();
         services.TryAddTransient<IStatisticsService, StatisticsService>();
+        services.TryAddTransient<IPackageDownloadService, PackageDownloadService>();
 
         services.TryAddTransient<DatabaseSearchService>();
         services.TryAddTransient<FileStorageService>();

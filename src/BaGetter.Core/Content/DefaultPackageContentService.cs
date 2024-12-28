@@ -3,6 +3,7 @@ using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using BaGetter.Core.Indexing;
 using BaGetter.Protocol.Models;
 using NuGet.Versioning;
 
@@ -15,13 +16,16 @@ public class DefaultPackageContentService : IPackageContentService
 {
     private readonly IPackageService _packages;
     private readonly IPackageStorageService _storage;
+    private readonly IPackageDownloadService _packageDownloadService;
 
     public DefaultPackageContentService(
         IPackageService packages,
-        IPackageStorageService storage)
+        IPackageStorageService storage,
+        IPackageDownloadService packageDownloadService)
     {
         _packages = packages ?? throw new ArgumentNullException(nameof(packages));
         _storage = storage ?? throw new ArgumentNullException(nameof(storage));
+        _packageDownloadService = packageDownloadService;
     }
 
     public async Task<PackageVersionsResponse> GetPackageVersionsOrNullAsync(
@@ -61,7 +65,13 @@ public class DefaultPackageContentService : IPackageContentService
     {
         if (!await _packages.ExistsAsync(id, version, cancellationToken))
         {
-            return null;
+            //包不存在，则自动下载
+            bool isSuccess = await _packageDownloadService.PackageDownloadAsync(id, version.ToNormalizedString(), cancellationToken);
+            if (!isSuccess) return null;
+
+            //再检查一次
+            if (!await _packages.ExistsAsync(id, version, cancellationToken))
+                return null;
         }
 
         return await _storage.GetNuspecStreamAsync(id, version, cancellationToken);

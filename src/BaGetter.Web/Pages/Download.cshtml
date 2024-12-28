@@ -1,0 +1,50 @@
+@page
+@model DownloadModel
+@using Microsoft.Extensions.DependencyInjection
+@inject IUrlGenerator _url
+@inject IServiceProvider services;
+
+@{
+    ViewData["Title"] = "Download package";
+    ViewData["SearchQuery"] = Model.Query;
+    ViewData["SearchVersion"] = Model.Version;
+
+    var baseUrl = Url.PageLink("/Index");
+    var publishUrl = _url.GetPackagePublishResourceUrl();
+    var serviceIndexUrl = _url.GetServiceIndexUrl();
+}
+
+<div class="col-sm-12">
+    <h1>Download</h1>
+    <hr class="breadcrumb-divider" />
+
+    <div>You can push packages using the service index <code>@serviceIndexUrl</code>.</div>
+
+    <form class="col-sm-12" action="@Url.Page("/Download")" method="get">
+        <div class="content">
+            <div class="script">
+                <input type="text"
+                       name="q"
+                       value="@ViewData["SearchQuery"]"
+                       autoComplete="off"
+                       style="width:20%"
+                       placeholder="package name..." />
+
+                <input type="text"
+                       name="version"
+                       value="@ViewData["SearchVersion"]"
+                       autoComplete="off"
+                       style="width:15%"
+                       placeholder="package version..." />
+
+                <button class="btn btn-default"
+                        type="submit"
+                        data-tottle="popover"
+                        data-placement="bottom">
+                    <i class="ms-Icon ms-Icon--Download"></i>
+                </button>
+
+            </div>
+        </div>
+    </form>
+</div>
